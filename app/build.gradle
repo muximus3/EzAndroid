@@ -1,26 +1,79 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.neenbedankt.android-apt'
 apply plugin: 'me.tatarka.retrolambda'
+def releaseTime() {
+    return new Date().format("yyyy-MM-dd", TimeZone.getTimeZone("UTC"))
+}
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.3"
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
     defaultConfig {
-        applicationId "com.ionicframework.tfdapp933657"
-        minSdkVersion 15
-        targetSdkVersion 23
-        versionCode 1
-        versionName "1.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        applicationId "com.xiaoduotech.cvd"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode rootProject.ext.versionCode
+        versionName rootProject.ext.versionName
+        manifestPlaceholders = [UMENG_CHANNEL_VALUE: "umeng"]
+        testInstrumentationRunner rootProject.ext.AndroidJUnitRunner
+        multiDexEnabled true
+    }
+    signingConfigs {
+        debug {
+            storeFile file(SOTRE_FILE)
+            storePassword STORE_PASSWORD
+            keyAlias KEYALIAS
+            keyPassword KEY_PASSWORD
+        }
+
+        release {
+            storeFile file(SOTRE_FILE)
+            storePassword STORE_PASSWORD
+            keyAlias KEYALIAS
+            keyPassword KEY_PASSWORD
+        }
     }
     buildTypes {
-        release {
+        debug {
+
+            versionNameSuffix "-debug"
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            zipAlignEnabled false
+            shrinkResources false
+            signingConfig signingConfigs.debug
         }
+        release {
+            minifyEnabled true
+            zipAlignEnabled true
+            // 移除无用的resource文件
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+            applicationVariants.all { variant ->
+                variant.outputs.each { output ->
+                    def outputFile = output.outputFile
+                    if (outputFile != null && outputFile.name.endsWith('.apk')) {
+                        // 输出apk名称为boohee_v1.0_2015-01-15_wandoujia.apk
+                        def fileName = "tianfucaifu${defaultConfig.versionName}_${releaseTime()}_${variant.productFlavors[0].name}_${defaultConfig.versionCode}.apk"
+                        output.outputFile = new File(outputFile.parent, fileName)
+                    }
+                }
+
+            }
+        }
+    }
+    productFlavors {
+        c360 {}
+        wandoujia {}
+        baidu {}
+        uc {}
+        qq {}
+    }
+    productFlavors.all { flavor ->
+        flavor.manifestPlaceholders = [UMENG_CHANNEL_VALUE: name]
     }
 }
 buildscript {
@@ -28,20 +81,31 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
+        classpath rootProject.ext.apt
     }
 }
-
-
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    testCompile 'junit:junit:4.12'
-    compile 'com.android.support:recyclerview-v7:23.4.0'
-    compile 'com.android.support:appcompat-v7:23.4.0'
-    compile 'com.android.support:support-annotations:23.4.0'
-    compile 'com.android.support:design:23.4.0'
-    compile 'com.jakewharton:butterknife:8.0.1'
-    apt 'com.jakewharton:butterknife-compiler:8.0.1'
-    testCompile 'junit:junit:4.12'
+    apt rootProject.ext.butterknifeCompiler
+    testCompile rootProject.ext.junit
+    compile rootProject.ext.recyclerview
+    compile rootProject.ext.appcompat
+    compile rootProject.ext.design
+    compile rootProject.ext.butterknife
+    compile rootProject.ext.support
+    compile rootProject.ext.palette
+    compile rootProject.ext.cardview
+    compile rootProject.ext.glide
+    compile rootProject.ext.WheelPicker
+    compile rootProject.ext.circleprogress
+    compile rootProject.ext.MPAndroidChart
+    //<=======leak_canary_start=======>
+    debugCompile    rootProject.ext.leakcanaryAndroid
+    releaseCompile  rootProject.ext.leakcanaryAndroidNoOp
+    testCompile    rootProject.ext.leakcanaryAndroidNoOp
+    //<=======leak_canary_end=======>
+    compile rootProject.ext.htmlparser
+    compile rootProject.ext.timsdk
     compile project(':domain')
+
 }

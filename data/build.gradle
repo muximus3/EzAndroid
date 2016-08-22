@@ -1,17 +1,18 @@
 apply plugin: 'com.android.library'
 apply plugin: 'me.tatarka.retrolambda'
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.3"
+    useLibrary("org.apache.http.legacy")
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
     defaultConfig {
-        minSdkVersion 15
-        targetSdkVersion 23
-        versionCode 1
-        versionName "1.0"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode rootProject.ext.versionCode
+        versionName rootProject.ext.versionName
     }
     buildTypes {
         release {
@@ -23,17 +24,16 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.json:json:20140107'
-    compile 'io.reactivex:rxandroid:1.2.0'
-    compile 'com.zhy:okhttputils:2.6.1'
-    compile 'com.google.code.gson:gson:2.7'
-    compile 'io.reactivex:rxjava:1.1.5'
-    compile 'com.squareup.retrofit2:retrofit:2.1.0'
-    compile 'com.squareup.retrofit2:adapter-rxjava:2.1.0'
-    compile 'com.squareup.retrofit2:converter-gson:2.1.0'
-    compile 'com.android.support:support-annotations:23.4.0'
-    compile 'com.squareup.okhttp3:logging-interceptor:3.3.1'
-    compile 'com.jakewharton.timber:timber:4.1.2'
+    testCompile rootProject.ext.junit
+    testCompile  rootProject.ext.json
+    compile rootProject.ext.okhttputils
+    compile rootProject.ext.gson
+    compile rootProject.ext.rxjava
+    compile rootProject.ext.rxandroid
+    compile rootProject.ext.retrofit
+    compile rootProject.ext.adapterRxjava
+    compile rootProject.ext.converterGson
+    compile rootProject.ext.supportAnnotations
+    compile rootProject.ext.loggingInterceptor
+    compile rootProject.ext.timber
 }
-
